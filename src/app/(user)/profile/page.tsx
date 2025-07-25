@@ -1,6 +1,12 @@
 // ユーザープロフィール表示・編集
-
+"use client";
+import { useSearchParams } from "next/navigation";
 export default function ProfilePage() {
+  const searchParams = useSearchParams();
+  const message = searchParams.get("message");
+
+  // searchParamsは自動で解決される（Next.js 13.4以降）
+
   // 仮のユーザーデータ
   const user = {
     username: "sample_user",
@@ -20,6 +26,9 @@ export default function ProfilePage() {
         borderRadius: 8,
       }}
     >
+      {message === "login-success" && (
+        <p style={{ color: "green" }}>ログインに成功しました！</p>
+      )}
       <h1>プロフィール</h1>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <img

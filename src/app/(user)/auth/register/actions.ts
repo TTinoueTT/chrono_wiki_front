@@ -1,6 +1,10 @@
 // src/app/(user)/auth/register/actions.ts
 "use server";
 
+// import { createSessionCookie } from "@/lib/session";
+// import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 export async function signupAction(prevState: any, formData: FormData) {
   // フォームデータを取得
   const payload = {
@@ -25,19 +29,31 @@ export async function signupAction(prevState: any, formData: FormData) {
   }
 
   // APIリクエスト
-  const res = await fetch("http://localhost:8020/api/v1/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/register`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
 
   console.log(res);
 
   if (res.ok) {
-    return { success: true, message: "登録が完了しました！" };
+    // 1. ログインエンドポイントを呼び出しアクセストークンを取得
+    const data = await res.json().catch(() => ({}));
+    console.log(data);
+    // TODO: アクセストークンの取得をやるかどうか
+    // 2. アクセストークンを Cookie に保存
+    // 3. ログインページにリダイレクト
+    // const accessToken = data.access_token;
+    // const sessionCookie = await createSessionCookie(accessToken);
+    // cookies().set("session", sessionCookie);
+    redirect("/auth/login?message=signup-success");
   } else {
     const data = await res.json().catch(() => ({}));
     console.log(data);
-    return { success: false, message: data.message || "登録に失敗しました" };
+    return { success: false, message: data.detail || "登録に失敗しました" };
   }
 }
