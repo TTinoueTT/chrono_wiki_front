@@ -3,7 +3,10 @@
 import { redirect } from "next/navigation";
 import { RegisterFormSchema, FormState } from "./definitions";
 
-export async function signupAction(state: FormState, formData: FormData) {
+export const signupAction = async (
+  state: FormState,
+  formData: FormData
+): Promise<FormState> => {
   // フォームデータを取得
   const payload = {
     email: formData.get("email"),
@@ -67,4 +70,4 @@ export async function signupAction(state: FormState, formData: FormData) {
     console.log(data);
     return { success: false, message: data.detail || "登録に失敗しました" };
   }
-}
+};

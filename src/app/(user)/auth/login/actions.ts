@@ -6,10 +6,10 @@ import { LoginFormSchema, FormState } from "./definitions";
 
 import { createSessionCookie } from "@/lib/session";
 
-export async function loginAction(
+export const loginAction = async (
   state: FormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<FormState> => {
   // フォームフィールドの検証
   const username = formData.get("username");
   const password = formData.get("password");
@@ -57,4 +57,4 @@ export async function loginAction(
     console.log(data);
     return { success: false, message: data.detail || "ログインに失敗しました" };
   }
-}
+};

@@ -1,7 +1,7 @@
 import { getAccessTokenFromCookie } from "@/lib/session";
 import { User } from "@/types/user";
 
-export async function fetchUserProfile(): Promise<User | null> {
+export const fetchUserProfile = async (): Promise<User | null> => {
   const accessToken = await getAccessTokenFromCookie();
   if (!accessToken) return null;
 
@@ -12,9 +12,9 @@ export async function fetchUserProfile(): Promise<User | null> {
   });
   if (!res.ok) return null;
   return await res.json();
-}
+};
 
-export async function fetchLogin(username: string, password: string) {
+export const fetchLogin = async (username: string, password: string) => {
   const params = new URLSearchParams();
   params.append("username", username);
   params.append("password", password);
@@ -26,4 +26,4 @@ export async function fetchLogin(username: string, password: string) {
     },
     body: params.toString(),
   });
-}
+};
