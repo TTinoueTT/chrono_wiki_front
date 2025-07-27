@@ -38,3 +38,10 @@ export async function parseSessionCookie(cookieValue: string): Promise<string> {
   const { payload } = await jwtVerify(cookieValue, SECRET);
   return payload.token as string;
 }
+
+export async function getAccessTokenFromCookie() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("access_token")?.value;
+  if (!session) return null;
+  return await parseSessionCookie(session);
+}

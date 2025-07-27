@@ -1,15 +1,13 @@
 // ログインページ
 "use client";
-import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 import { loginAction } from "./actions";
+import RedirectMessage from "@/components/RedirectMessage";
+import { FormState } from "./definitions";
 
-const initialState = { success: false, message: "" };
+const initialState: FormState = { message: "" };
 
 export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message");
-
   const [state, formAction, isPending] = useActionState(
     loginAction,
     initialState
@@ -25,16 +23,14 @@ export default function LoginPage() {
         borderRadius: 8,
       }}
     >
-      {message === "signup-success" && (
-        <p style={{ color: "green" }}>登録が完了しました！</p>
-      )}
+      <RedirectMessage />
       <h1>ログイン</h1>
       <form action={formAction}>
         <div>
           <label>ユーザー名またはメールアドレス</label>
           <input name="username" required autoComplete="username" />
         </div>
-        {state.errors?.username && (
+        {"errors" in state && state.errors?.username && (
           <p style={{ color: "red" }}>{state.errors.username}</p>
         )}
         <div>
@@ -46,18 +42,14 @@ export default function LoginPage() {
             autoComplete="current-password"
           />
         </div>
-        {state.errors?.password && (
+        {"errors" in state && state.errors?.password && (
           <p style={{ color: "red" }}>{state.errors.password}</p>
         )}
         <button type="submit" disabled={isPending}>
           {isPending ? "ログイン中..." : "ログイン"}
         </button>
       </form>
-      {/* {state.message && (
-        <p style={{ color: state.success ? "green" : "red" }}>
-          {state.message}
-        </p>
-      )} */}
+      {state.message && <p style={{ color: "red" }}>{state.message}</p>}
     </div>
   );
 }

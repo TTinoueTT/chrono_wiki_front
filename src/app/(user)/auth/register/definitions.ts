@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-export const LoginFormSchema = z.object({
+export const RegisterFormSchema = z.object({
+  email: z.string().email("メールアドレスが不正です"),
+  full_name: z.string().optional(),
+  avatar_url: z.string().url("アバターURLが不正です").optional(),
+  bio: z
+    .string()
+    .max(100, { message: "自己紹介は100文字以内で入力してください" })
+    .optional(),
   username: z
     .string()
     .min(1, { message: "ユーザー名は必須です" })
@@ -21,8 +28,12 @@ export const LoginFormSchema = z.object({
 export type FormState =
   | {
       errors?: {
+        email?: string[];
         username?: string[];
         password?: string[];
+        full_name?: string[];
+        avatar_url?: string[];
+        bio?: string[];
       };
       message?: string;
     }

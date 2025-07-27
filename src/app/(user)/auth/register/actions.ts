@@ -1,11 +1,9 @@
-// src/app/(user)/auth/register/actions.ts
 "use server";
 
-// import { createSessionCookie } from "@/lib/session";
-// import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { RegisterFormSchema, FormState } from "./definitions";
 
-export async function signupAction(prevState: any, formData: FormData) {
+export async function signupAction(state: FormState, formData: FormData) {
   // フォームデータを取得
   const payload = {
     email: formData.get("email"),
@@ -16,17 +14,30 @@ export async function signupAction(prevState: any, formData: FormData) {
     password: formData.get("password"),
   };
 
-  // 必須項目チェック
-  if (
-    !payload.email ||
-    !payload.username ||
-    String(payload.username).length < 3
-  ) {
+  const validatedFields = RegisterFormSchema.safeParse({
+    email: payload.email,
+    username: payload.username,
+    password: payload.password,
+    full_name: payload.full_name,
+    avatar_url: payload.avatar_url,
+    bio: payload.bio,
+  });
+
+  if (!validatedFields.success) {
+    const formatted = validatedFields.error.format();
     return {
-      success: false,
-      message: "メールアドレスとユーザー名（3文字以上）は必須です",
+      errors: {
+        email: formatted.email?._errors,
+        username: formatted.username?._errors,
+        password: formatted.password?._errors,
+        full_name: formatted.full_name?._errors,
+        avatar_url: formatted.avatar_url?._errors,
+        bio: formatted.bio?._errors,
+      },
     };
   }
+
+  console.log(payload);
 
   // APIリクエスト
   const res = await fetch(

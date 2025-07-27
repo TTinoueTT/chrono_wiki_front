@@ -1,20 +1,11 @@
 // ユーザープロフィール表示・編集
-"use client";
-import { useSearchParams } from "next/navigation";
-export default function ProfilePage() {
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message");
+import RedirectMessage from "@/components/RedirectMessage";
+import { fetchUserProfile } from "@/lib/api/auth";
 
-  // searchParamsは自動で解決される（Next.js 13.4以降）
+export default async function ProfilePage() {
+  const user = await fetchUserProfile();
 
-  // 仮のユーザーデータ
-  const user = {
-    username: "sample_user",
-    email: "sample@example.com",
-    full_name: "サンプル 太郎",
-    avatar_url: "https://placehold.co/100x100",
-    bio: "これはサンプルの自己紹介です。",
-  };
+  console.log(user);
 
   return (
     <div
@@ -26,13 +17,13 @@ export default function ProfilePage() {
         borderRadius: 8,
       }}
     >
-      {message === "login-success" && (
-        <p style={{ color: "green" }}>ログインに成功しました！</p>
-      )}
+      <RedirectMessage />
       <h1>プロフィール</h1>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <img
-          src={user.avatar_url}
+          src={
+            user?.avatar_url ? user.avatar_url : "https://placehold.co/100x100"
+          }
           alt="avatar"
           width={80}
           height={80}
@@ -40,17 +31,17 @@ export default function ProfilePage() {
         />
         <div>
           <div>
-            <strong>{user.full_name}</strong>
+            <strong>{user?.full_name}</strong>
           </div>
-          <div>@{user.username}</div>
+          <div>@{user?.username}</div>
         </div>
       </div>
       <div style={{ marginTop: 16 }}>
         <div>
-          <strong>メール:</strong> {user.email}
+          <strong>メール:</strong> {user?.email}
         </div>
         <div>
-          <strong>自己紹介:</strong> {user.bio}
+          <strong>自己紹介:</strong> {user?.bio}
         </div>
       </div>
       <button style={{ marginTop: 24 }}>プロフィール編集</button>

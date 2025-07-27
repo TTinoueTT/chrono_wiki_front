@@ -1,8 +1,9 @@
 // src/app/(user)/auth/login/actions.ts
 "use server";
 import { redirect } from "next/navigation";
-
+import { fetchLogin } from "@/lib/api/auth";
 import { LoginFormSchema, FormState } from "./definitions";
+
 import { createSessionCookie } from "@/lib/session";
 
 export async function loginAction(
@@ -12,9 +13,10 @@ export async function loginAction(
   // フォームフィールドの検証
   const username = formData.get("username");
   const password = formData.get("password");
+
   const validatedFields = LoginFormSchema.safeParse({
-    username: formData.get("username"),
-    password: formData.get("password"),
+    username: username,
+    password: password,
   });
 
   if (!validatedFields.success) {
@@ -30,18 +32,7 @@ export async function loginAction(
   // 仮実装: 入力内容をコンソールに出力
   console.log("ログイン情報", { username, password });
 
-  const params = new URLSearchParams();
-  params.append("username", String(username));
-  params.append("password", String(password));
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params.toString(),
-    }
-  );
+  const res = await fetchLogin(String(username), String(password));
 
   console.log(res);
 
@@ -64,6 +55,6 @@ export async function loginAction(
   } else {
     const data = await res.json().catch(() => ({}));
     console.log(data);
-    return { message: "ログインに失敗しました" };
+    return { success: false, message: data.detail || "ログインに失敗しました" };
   }
 }
