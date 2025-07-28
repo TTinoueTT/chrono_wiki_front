@@ -5,7 +5,7 @@ import { fetchUserProfile } from "@/lib/api/auth";
 export default async function ProfilePage() {
   const user = await fetchUserProfile();
 
-  console.log(user);
+  // console.log(user);
 
   return (
     <div

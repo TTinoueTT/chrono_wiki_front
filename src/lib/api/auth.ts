@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getAccessTokenFromCookie } from "@/lib/session";
 import { User } from "@/types/user";
 

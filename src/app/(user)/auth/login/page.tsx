@@ -4,6 +4,9 @@ import { useActionState } from "react";
 import { loginAction } from "./actions";
 import RedirectMessage from "@/components/RedirectMessage";
 import { FormState } from "./definitions";
+import { useAuth } from "@/components/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const initialState: FormState = { message: "" };
 
@@ -12,6 +15,29 @@ export default function LoginPage() {
     loginAction,
     initialState
   );
+  const { login } = useAuth();
+  const router = useRouter();
+
+  // ログイン成功時の処理
+  useEffect(() => {
+    if (state.message === "ログインに成功しました") {
+      // ユーザー情報を取得してAuthProviderの状態を更新
+      const fetchUserAndLogin = async () => {
+        try {
+          const response = await fetch("/api/auth/me");
+          if (response.ok) {
+            const user = await response.json();
+            login(user);
+            router.push("/profile?message=login-success");
+          }
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+        }
+      };
+
+      fetchUserAndLogin();
+    }
+  }, [state.message, login, router]);
 
   return (
     <div

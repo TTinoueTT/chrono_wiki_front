@@ -102,3 +102,36 @@ chrono_wiki_front は chrono_wiki プロジェクトのフロントエンド用�
 - レスポンシブ対応
 
 **どの認証方式（JWT、セッション、OAuth等）を想定しているか教えてもらえれば、より具体的な実装例を提案できる！**
+
+## 7. コーディング規約
+
+### ESLint設定
+プロジェクトでは一貫したコードスタイルを保つため、以下のESLintルールを適用しています：
+
+#### 関数宣言の使い分け
+- **Reactコンポーネント**: `function`宣言を使用
+  ```tsx
+  export default function MyComponent() {
+    return <div>Hello</div>;
+  }
+  ```
+- **通常の関数**: アロー関数を使用
+  ```ts
+  export const fetchData = async () => {
+    // API呼び出しなど
+  };
+  ```
+
+#### ルールの意味
+- **`func-style: "expression"`**: 通常の関数をアロー関数に統一
+- **`react/function-component-definition`**: Reactコンポーネントは`function`宣言を推奨
+- **`prefer-arrow-callback`**: コールバック関数をアロー関数に統一
+- **`arrow-spacing`**: アロー関数のスペースを統一
+
+#### 理由
+- **Reactコンポーネント**: デバッグ時のスタックトレースが分かりやすい
+- **通常の関数**: より簡潔で一貫性のある記法
+- **コールバック**: `this`の束縛問題を回避
+
+- [ ] ログアウト処理
+- [ ] [ミドルウェア処理](https://nextjsjp.org/docs/app/guides/authentication#%E3%83%9F%E3%83%89%E3%83%AB%E3%82%A6%E3%82%A7%E3%82%A2%E3%81%AB%E3%82%88%E3%82%8B%E6%A5%BD%E8%A6%B3%E7%9A%84%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3)

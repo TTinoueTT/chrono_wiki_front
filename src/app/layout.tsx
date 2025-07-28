@@ -1,13 +1,22 @@
 import React, { type ReactNode } from "react";
+import Header from "@/components/Header";
+import { AuthProvider } from "@/components/AuthProvider";
+import { getAuthStatus } from "@/lib/session";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
-  children: ReactNode
+  children: ReactNode;
 }) {
+  const initialAuth = await getAuthStatus();
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="ja">
+      <body>
+        <AuthProvider initialAuth={initialAuth}>
+          <Header />
+          <main>{children}</main>
+        </AuthProvider>
+      </body>
     </html>
-  )
+  );
 }
