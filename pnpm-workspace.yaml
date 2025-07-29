@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - "@tailwindcss/oxide"
+
+ignore-workspace-root-check: true

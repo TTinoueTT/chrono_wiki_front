@@ -6,6 +6,13 @@ export default [
   ...tseslint.configs.recommended,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
+    languageOptions: {
+      globals: {
+        module: "readonly",
+        require: "readonly",
+        exports: "readonly",
+      },
+    },
     rules: {
       "func-style": ["error", "expression"],
       "prefer-arrow-callback": "error",
