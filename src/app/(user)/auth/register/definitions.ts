@@ -2,17 +2,31 @@ import { z } from "zod";
 
 export const RegisterFormSchema = z.object({
   email: z.string().email("メールアドレスが不正です"),
-  full_name: z.string().optional(),
-  avatar_url: z.string().url("アバターURLが不正です").optional(),
+  full_name: z
+    .string()
+    .max(100, {
+      message: "本名は100文字以下で入力してください。",
+    })
+    .optional(),
+  avatar_url: z
+    .string()
+    .url({
+      message: "有効なURLを入力してください。",
+    })
+    .optional()
+    .or(z.literal("")),
   bio: z
     .string()
-    .max(100, { message: "自己紹介は100文字以内で入力してください" })
+    .max(500, { message: "自己紹介は500文字以内で入力してください" })
     .optional(),
   username: z
     .string()
-    .min(1, { message: "ユーザー名は必須です" })
-    .min(2, { message: "Name must be at least 2 characters long." })
-    .trim(),
+    .min(3, {
+      message: "ユーザー名は3文字以上で入力してください。",
+    })
+    .max(50, {
+      message: "ユーザー名は50文字以下で入力してください。",
+    }),
   password: z
     .string()
     .min(1, { message: "パスワードは必須です" })

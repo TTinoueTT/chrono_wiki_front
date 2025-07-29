@@ -2,6 +2,7 @@ import React, { type ReactNode } from "react";
 import Header from "@/components/Header";
 import { AuthProvider } from "@/components/AuthProvider";
 import { getAuthStatus } from "@/lib/session";
+import "./globals.css";
 
 export default async function RootLayout({
   children,

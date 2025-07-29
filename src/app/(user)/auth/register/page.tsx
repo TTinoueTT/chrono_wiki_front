@@ -1,9 +1,26 @@
-// ユーザー新規登録ページ
-// src/app/(user)/auth/register/page.tsx
 "use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { useActionState } from "react";
 import { signupAction } from "./actions";
-import { FormState } from "./definitions";
+import { RegisterFormSchema, FormState } from "./definitions";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+type FormData = z.infer<typeof RegisterFormSchema>;
 
 const initialState: FormState = { message: "" };
 
@@ -13,68 +30,178 @@ export default function RegisterPage() {
     initialState
   );
 
+  const form = useForm<FormData>({
+    resolver: zodResolver(RegisterFormSchema),
+    defaultValues: {
+      email: "",
+      username: "",
+      full_name: "",
+      avatar_url: "",
+      bio: "",
+      password: "",
+    },
+  });
+
+  // function onSubmit(values: FormData) {
+  //   // フォームデータをFormData形式に変換
+  //   const formData = new FormData();
+  //   Object.entries(values).forEach(([key, value]) => {
+  //     if (value !== undefined && value !== "") {
+  //       formData.append(key, value);
+  //     }
+  //   });
+
+  //   // サーバーアクションを呼び出し
+  //   formAction(formData);
+  // }
+
   return (
-    <div>
-      <h1>ユーザー新規登録</h1>
-      <form action={formAction}>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
         <div>
-          <label>メールアドレス*</label>
-          <input name="email" type="email" required autoComplete="email" />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            ユーザー新規登録
+          </h2>
         </div>
-        {"errors" in state && state.errors?.email && (
-          <p style={{ color: "red" }}>{state.errors.email}</p>
+
+        <Form {...form}>
+          <form action={formAction} className="space-y-6">
+            {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>メールアドレス*</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="example@example.com"
+                      type="email"
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ユーザー名*</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="username"
+                      autoComplete="username"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    2文字以上で入力してください。
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="full_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>本名</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="山田 太郎"
+                      autoComplete="name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="avatar_url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>プロフィール画像URL</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://example.com/avatar.jpg"
+                      type="url"
+                      autoComplete="photo"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    有効なURLを入力してください。
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bio"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>自己紹介</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="自己紹介を入力してください..."
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    500文字以下で入力してください。
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>パスワード*</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="パスワード"
+                      type="password"
+                      autoComplete="new-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    8文字以上で、英字と数字を含めてください。
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "登録中..." : "登録"}
+            </Button>
+          </form>
+        </Form>
+
+        {state.message && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-800 text-sm">{state.message}</p>
+          </div>
         )}
-        <div>
-          <label>ユーザー名*</label>
-          <input
-            name="username"
-            minLength={3}
-            maxLength={50}
-            required
-            autoComplete="username"
-          />
-        </div>
-        {"errors" in state && state.errors?.username && (
-          <p style={{ color: "red" }}>{state.errors.username}</p>
-        )}
-        <div>
-          <label>本名</label>
-          <input name="full_name" maxLength={100} autoComplete="name" />
-        </div>
-        {"errors" in state && state.errors?.full_name && (
-          <p style={{ color: "red" }}>{state.errors.full_name}</p>
-        )}
-        <div>
-          <label>プロフィール画像URL</label>
-          <input name="avatar_url" maxLength={500} autoComplete="photo" />
-        </div>
-        {"errors" in state && state.errors?.avatar_url && (
-          <p style={{ color: "red" }}>{state.errors.avatar_url}</p>
-        )}
-        <div>
-          <label>自己紹介</label>
-          <textarea name="bio" maxLength={500} autoComplete="off" />
-        </div>
-        {"errors" in state && state.errors?.bio && (
-          <p style={{ color: "red" }}>{state.errors.bio}</p>
-        )}
-        <div>
-          <label>パスワード*</label>
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
-        </div>
-        {"errors" in state && state.errors?.password && (
-          <p style={{ color: "red" }}>{state.errors.password}</p>
-        )}
-        <button type="submit" disabled={isPending}>
-          {isPending ? "登録中..." : "登録"}
-        </button>
-      </form>
-      {state.message && <p style={{ color: "red" }}>{state.message}</p>}
+      </div>
     </div>
   );
 }
