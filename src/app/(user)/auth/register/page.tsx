@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useActionState } from "react";
 import { signupAction } from "./actions";
 import { RegisterFormSchema, FormState } from "./definitions";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,13 @@ export default function RegisterPage() {
     initialState
   );
 
+  // 登録成功時の処理
+  useAuthRedirect({
+    successMessage: state.message,
+    redirectPath: "/profile",
+    redirectMessage: "signup-success",
+  });
+
   const form = useForm<FormData>({
     resolver: zodResolver(RegisterFormSchema),
     defaultValues: {
@@ -42,19 +50,6 @@ export default function RegisterPage() {
     },
   });
 
-  // function onSubmit(values: FormData) {
-  //   // フォームデータをFormData形式に変換
-  //   const formData = new FormData();
-  //   Object.entries(values).forEach(([key, value]) => {
-  //     if (value !== undefined && value !== "") {
-  //       formData.append(key, value);
-  //     }
-  //   });
-
-  //   // サーバーアクションを呼び出し
-  //   formAction(formData);
-  // }
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -66,7 +61,6 @@ export default function RegisterPage() {
 
         <Form {...form}>
           <form action={formAction} className="space-y-6">
-            {/* <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> */}
             <FormField
               control={form.control}
               name="email"
