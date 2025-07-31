@@ -1,6 +1,7 @@
 // ユーザープロフィール表示・編集
 import RedirectMessage from "@/components/RedirectMessage";
 import { fetchUserProfile } from "@/lib/api/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default async function ProfilePage() {
   const user = await fetchUserProfile();
@@ -20,18 +21,19 @@ export default async function ProfilePage() {
         }}
       >
         <h1>プロフィール</h1>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <img
-            src={
-              user?.avatar_url
-                ? user.avatar_url
-                : "https://placehold.co/100x100"
-            }
-            alt="avatar"
-            width={80}
-            height={80}
-            style={{ borderRadius: "50%" }}
-          />
+        <div className="flex items-center gap-4">
+          <Avatar className="size-16">
+            <AvatarImage
+              src={
+                user?.avatar_url
+                  ? user.avatar_url
+                  : "https://placehold.co/100x100"
+              }
+            />
+            <AvatarFallback>
+              {user?.full_name?.slice(0, 2) || "N/A"}
+            </AvatarFallback>
+          </Avatar>
           <div>
             <div>
               <strong>{user?.full_name}</strong>
@@ -39,7 +41,7 @@ export default async function ProfilePage() {
             <div>@{user?.username}</div>
           </div>
         </div>
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           <div>
             <strong>メール:</strong> {user?.email}
           </div>
@@ -47,7 +49,7 @@ export default async function ProfilePage() {
             <strong>自己紹介:</strong> {user?.bio}
           </div>
         </div>
-        <button style={{ marginTop: 24 }}>プロフィール編集</button>
+        <button className="mt-4">プロフィール編集</button>
       </div>
     </>
   );
