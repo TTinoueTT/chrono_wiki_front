@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useActionState } from "react";
+import { useActionState, startTransition } from "react";
 import { signupAction } from "./actions";
 import { RegisterFormSchema, FormState } from "./definitions";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 type FormData = z.infer<typeof RegisterFormSchema>;
 
@@ -44,11 +45,61 @@ export default function RegisterPage() {
       email: "",
       username: "",
       full_name: "",
-      avatar_url: "",
+      avatar_file: null,
       bio: "",
       password: "",
     },
   });
+
+  // カスタムフォーム送信処理
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // フォームのバリデーション
+    const isValid = await form.trigger();
+    if (!isValid) return;
+
+    // フォームデータを取得
+    const formData = new FormData();
+    const values = form.getValues();
+
+    // 各フィールドをFormDataに追加
+    formData.append("email", values.email);
+    formData.append("username", values.username);
+    if (values.full_name) {
+      formData.append("full_name", values.full_name);
+    }
+    if (values.bio) {
+      formData.append("bio", values.bio);
+    }
+    formData.append("password", values.password);
+
+    // ファイルデータを追加
+    if (values.avatar_file) {
+      formData.append("avatar_file", values.avatar_file);
+    }
+
+    /* eslint-disable no-console */
+    console.log("送信するFormData:", {
+      email: values.email,
+      username: values.username,
+      full_name: values.full_name,
+      avatar_file: values.avatar_file
+        ? {
+            name: values.avatar_file.name,
+            size: values.avatar_file.size,
+            type: values.avatar_file.type,
+          }
+        : null,
+      bio: values.bio,
+    });
+    /* eslint-enable no-console */
+
+    // startTransitionを使用してServer Actionを呼び出し
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -60,7 +111,7 @@ export default function RegisterPage() {
         </div>
 
         <Form {...form}>
-          <form action={formAction} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
               control={form.control}
               name="email"
@@ -94,7 +145,7 @@ export default function RegisterPage() {
                     />
                   </FormControl>
                   <FormDescription>
-                    2文字以上で入力してください。
+                    3文字以上で入力してください。
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -121,20 +172,20 @@ export default function RegisterPage() {
 
             <FormField
               control={form.control}
-              name="avatar_url"
+              name="avatar_file"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>プロフィール画像URL</FormLabel>
+                  <FormLabel>プロフィール画像</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="https://example.com/avatar.jpg"
-                      type="url"
-                      autoComplete="photo"
-                      {...field}
+                    <ImageUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      disabled={false} // 画像アップロードを有効にする
                     />
                   </FormControl>
                   <FormDescription>
-                    有効なURLを入力してください。
+                    5MB以下の画像ファイルを選択してください。
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

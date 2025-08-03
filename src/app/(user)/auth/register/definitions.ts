@@ -8,13 +8,16 @@ export const RegisterFormSchema = z.object({
       message: "本名は100文字以下で入力してください。",
     })
     .optional(),
-  avatar_url: z
-    .string()
-    .url({
-      message: "有効なURLを入力してください。",
+  avatar_file: z
+    .instanceof(File, { message: "画像ファイルを選択してください" })
+    .refine((file) => file.size <= 5 * 1024 * 1024, {
+      message: "ファイルサイズは5MB以下にしてください",
+    })
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "画像ファイルを選択してください",
     })
     .optional()
-    .or(z.literal("")),
+    .nullable(),
   bio: z
     .string()
     .max(500, { message: "自己紹介は500文字以内で入力してください" })
@@ -46,7 +49,7 @@ export type FormState =
         username?: string[];
         password?: string[];
         full_name?: string[];
-        avatar_url?: string[];
+        avatar_file?: string[];
         bio?: string[];
       };
       message?: string;
