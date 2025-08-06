@@ -1,9 +1,14 @@
 import "server-only";
 
-import { getAccessTokenFromCookie } from "@/lib/session";
+import { cookies } from "next/headers";
+// import { parseSessionCookie } from "@/lib/session";
 
 export const fetchPersons = async () => {
-  const accessToken = await getAccessTokenFromCookie();
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  // const accessToken = await parseSessionCookie(
+  //   cookieStore.get("access_token")?.value
+  // );
   if (!accessToken) return null;
 
   const response = await fetch(

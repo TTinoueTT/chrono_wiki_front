@@ -1,19 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { AuthMessage } from "@/types/messages";
 
-export async function POST(request: NextRequest) {
+export const POST = async () => {
   try {
     const cookieStore = await cookies();
-
-    // アクセストークンのcookieを削除
     cookieStore.delete("access_token");
-
-    // リフレッシュトークンのcookieを削除
     cookieStore.delete("refresh_token");
-
-    return NextResponse.json({ message: "Logged out successfully" });
+    return NextResponse.json({ message: AuthMessage.LOGOUT_SUCCESS });
   } catch (error) {
     console.error("Logout error:", error);
-    return NextResponse.json({ error: "Failed to logout" }, { status: 500 });
+    return NextResponse.json(
+      { error: AuthMessage.LOGOUT_FAILED },
+      { status: 500 }
+    );
   }
-}
+};

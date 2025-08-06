@@ -2,8 +2,8 @@
 "use server";
 import { fetchLogin } from "@/lib/api/auth";
 import { LoginFormSchema, FormState } from "./definitions";
-
 import { createSessionCookie } from "@/lib/session";
+import { AuthMessage } from "@/types/messages";
 
 export const loginAction = async (
   state: FormState,
@@ -28,12 +28,7 @@ export const loginAction = async (
     };
   }
 
-  // 仮実装: 入力内容をコンソールに出力
-  // console.log("ログイン情報", { username, password });
-
   const res = await fetchLogin(String(username), String(password));
-
-  // console.log(res);
 
   if (res.ok) {
     const data = await res.json().catch(() => ({}));
@@ -49,10 +44,9 @@ export const loginAction = async (
       token: data.refresh_token,
       maxAge: 60 * 60 * 24 * 7, // 例: 7日
     });
-    return { message: "ログインに成功しました" };
+    return { message: AuthMessage.LOGIN_SUCCESS };
   } else {
     const data = await res.json().catch(() => ({}));
-    // console.log(data);
-    return { success: false, message: data.detail || "ログインに失敗しました" };
+    return { success: false, message: data.detail || AuthMessage.LOGIN_FAILED };
   }
 };

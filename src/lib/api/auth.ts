@@ -1,10 +1,10 @@
 import "server-only";
 
-import { getAccessTokenFromCookie } from "@/lib/session";
 import { User } from "@/types/user";
 
-export const fetchUserProfile = async (): Promise<User | null> => {
-  const accessToken = await getAccessTokenFromCookie();
+export const fetchUserProfile = async (
+  accessToken: string
+): Promise<User | null> => {
   if (!accessToken) return null;
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
@@ -27,6 +27,18 @@ export const fetchLogin = async (username: string, password: string) => {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: params.toString(),
+  });
+};
+
+// リフレッシュトークンを使用して新しいアクセストークンを取得
+export const refreshAccessToken = async (refreshToken: string) => {
+  return await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-API-Key": `${process.env.CHRONO_WIKI_API_KEY}`,
+    },
+    body: JSON.stringify({ refresh_token: refreshToken }),
   });
 };
 

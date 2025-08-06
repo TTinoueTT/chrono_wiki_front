@@ -3,6 +3,7 @@
 import { fetchLogin, uploadAvatarImage } from "@/lib/api/auth";
 import { RegisterFormSchema, FormState } from "./definitions";
 import { createSessionCookie } from "@/lib/session";
+import { AuthMessage } from "@/types/messages";
 
 export const signupAction = async (
   state: FormState,
@@ -166,7 +167,7 @@ export const signupAction = async (
     console.log("セッションクッキー作成完了"); // eslint-disable-line no-console
 
     // 成功メッセージを返す（クライアントサイドでリダイレクト処理）
-    return { message: "signup-success" };
+    return { message: AuthMessage.SIGNUP_SUCCESS };
   } catch (error) {
     // 予期しないエラーの処理
     console.error("Signup action error:", error);

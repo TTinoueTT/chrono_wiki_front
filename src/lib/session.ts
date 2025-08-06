@@ -1,7 +1,8 @@
 import "server-only";
 
 // セッション管理用のライブラリ
-import { SignJWT, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
+// import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { User } from "@/types/user";
 import { fetchUserProfile } from "./api/auth";
@@ -24,15 +25,16 @@ export const createSessionCookie = async ({
   token: string;
   maxAge: number;
 }): Promise<void> => {
-  const jwt = await new SignJWT({ token })
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(`${maxAge}s`)
-    .sign(SECRET);
+  // const jwt = await new SignJWT({ token })
+  //   .setProtectedHeader({ alg: "HS256" })
+  //   .setIssuedAt()
+  //   .setExpirationTime(`${maxAge}s`)
+  //   .sign(SECRET);
 
   const cookieStore = await cookies();
 
-  cookieStore.set(name, jwt, {
+  cookieStore.set(name, token, {
+    // cookieStore.set(name, jwt, {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",
@@ -65,23 +67,11 @@ export const parseSessionCookie = async (
 };
 
 /**
- * Cookieからアクセストークンを取得する
- * @returns アクセストークン
- */
-export const getAccessTokenFromCookie = async (): Promise<string | null> => {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("access_token")?.value;
-  if (!session) return null;
-  return await parseSessionCookie(session);
-};
-
-/**
  * 堅牢なログイン状態判定（トークン有効性チェック）
  * セキュリティ重視の場合に使用
  */
-export const isLoggedIn = async (): Promise<boolean> => {
+export const isLoggedIn = async (accessToken: string): Promise<boolean> => {
   try {
-    const accessToken = await getAccessTokenFromCookie(); // ← ここでjwtVerify実行
     return !!accessToken;
   } catch (error) {
     // jwtVerifyでexp/iat/署名チェックが失敗した場合
@@ -94,18 +84,19 @@ export const isLoggedIn = async (): Promise<boolean> => {
  * ユーザー情報付きのログイン状態判定
  * プロフィールページなどで使用
  */
-export const getAuthStatus = async (): Promise<{
+export const getAuthStatus = async (
+  accessToken: string
+): Promise<{
   isLoggedIn: boolean;
   user: User | null;
 }> => {
   try {
-    const accessToken = await getAccessTokenFromCookie();
     if (!accessToken) {
       return { isLoggedIn: false, user: null };
     }
 
     // ユーザー情報を取得
-    const user = await fetchUserProfile();
+    const user = await fetchUserProfile(accessToken);
 
     return {
       isLoggedIn: !!user,
@@ -115,4 +106,13 @@ export const getAuthStatus = async (): Promise<{
     console.error("Auth status check failed:", error);
     return { isLoggedIn: false, user: null };
   }
+};
+
+/**
+ * セッションCookieを削除する
+ * @param name セッションCookieの名前
+ */
+export const deleteSessionCookie = async ({ name }: { name: string }) => {
+  const cookieStore = await cookies();
+  cookieStore.delete(name);
 };

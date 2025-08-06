@@ -7,6 +7,8 @@ import { useActionState, startTransition } from "react";
 import { signupAction } from "./actions";
 import { RegisterFormSchema, FormState } from "./definitions";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import { useEffect } from "react";
+import { AuthMessage, isSuccessMessage } from "@/types/messages";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { MessageDisplay } from "@/components/MessageDisplay";
 
 type FormData = z.infer<typeof RegisterFormSchema>;
 
@@ -38,6 +41,18 @@ export default function RegisterPage() {
     redirectPath: "/profile",
     redirectMessage: "signup-success",
   });
+
+  // 登録成功時のリダイレクト制御
+  useEffect(() => {
+    if (state.message === AuthMessage.SIGNUP_SUCCESS) {
+      console.log("登録成功、リダイレクト実行"); // eslint-disable-line no-console
+      // リダイレクト後にstateをリセット
+      const timer = setTimeout(() => {
+        formAction(new FormData());
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.message, formAction]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(RegisterFormSchema),
@@ -104,6 +119,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
+        <MessageDisplay className="mb-4" />
+
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             ユーザー新規登録
@@ -241,7 +258,7 @@ export default function RegisterPage() {
           </form>
         </Form>
 
-        {state.message && (
+        {state.message && !isSuccessMessage(state.message) && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
             <p className="text-red-800 text-sm">{state.message}</p>
           </div>

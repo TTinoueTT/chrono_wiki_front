@@ -17,7 +17,7 @@ export default [
       "func-style": ["error", "expression"],
       "prefer-arrow-callback": "error",
       "arrow-spacing": "error",
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-console": ["warn", { allow: ["info", "warn", "error", "assert"] }],
     },
   },
 ];
